@@ -1,0 +1,633 @@
+-----HTML Index--------------------
+<appSettings>
+    <add key="MongoDBServer" value="mongodb://localhost:27017" />
+    <add key="DBName" value="MobileDB" />
+  </appSettings>
+
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="MobileDetails.aspx.cs"
+    Inherits="MobileAngularJSWebApplication.View.MobileDetails" %>
+
+<!DOCTYPE html novalidate>
+<html>
+<head>
+    <title>Mobile Description</title>
+    <%--External CSS--%>
+    <link href="../Styles/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../Styles/dashboard.css" rel="stylesheet" type="text/css" />
+    <%--External JS files--%>
+    <script src="../Scripts/angular.min.js" type="text/javascript"></script>
+    <script src="../Scripts/angular-route.js" type="text/javascript"></script>
+    <script src="../Scripts/angular-messages.js" type="text/javascript"></script>
+    <script src="../Scripts/checklist-model.js" type="text/javascript"></script>
+    <%--Customized JS files--%>
+    <script src="../app.js" type="text/javascript"></script>
+    <script src="../route.js" type="text/javascript"></script>
+    <script src="../Controller/addMobileCtrl.js" type="text/javascript"></script>
+    <script src="../Controller/listMobileCtrl.js" type="text/javascript"></script>
+    <script src="../Factory/MobileFactory.js" type="text/javascript"></script>
+    <script src="../JSON/Country.js" type="text/javascript"></script>
+    <script src="../JSON/State.js" type="text/javascript"></script>
+</head>
+<body ng-app="myApp">
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Mobile Application</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#Add">Add Mobile</a></li>
+          <li><a href="#List">List Mobile</a></li>          
+        </ul>
+      </div>
+    </nav>
+    <div ng-view>
+    </div>
+    </ng-view>
+</body>
+</html>
+
+
+----------------------- Add HTML
+
+<form class="form-horizontal" name = "mobileForm" novalidate>
+<fieldset>
+    <!-- Form Name -->
+    <legend>Add Mobile</legend>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="txtMobileName">
+            Mobile Name</label>
+        <div class="col-md-4">
+            <input id="txtMobileName" name="txtMobileName" type="text" placeholder="Enter Mobile Name"
+                class="form-control input-md" required="" ng-model="mobile.MobileName" ng-minlength="3" ng-maxlength="8" required>
+                <div ng-messages="mobileForm.txtMobileName.$error" ng-show = "mobileForm.txtMobileName.$touched && mobileForm.txtMobileName.$invalid">                                                                   
+                    <p ng-message="minlength">Your name is too short.</p>
+                    <p ng-message="maxlength">Your name is too long.</p>
+                    <p ng-message="required">Mobile name is required.</p>
+                </div>
+        </div>
+    </div>
+    <!-- Text input-->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="txtMobileName">
+            Manufacturing Date</label>
+        <div class="col-md-4">
+            <input id="Text1" name="txtDate" type="date" placeholder="Enter Mobile Name" class="form-control input-md"
+                required="" ng-model="mobile.ManufacDate" required>
+                <div ng-messages="mobileForm.txtDate.$error" ng-show = "mobileForm.txtDate.$touched && mobileForm.txtDate.$invalid">  
+                    <p ng-message="required">Manufacturing date is required.</p>
+                </div>
+        </div>
+    </div>
+    <!-- Multiple Checkboxes (inline) -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="MFeaters">
+            Features</label>
+        <div class="col-md-4">
+            <label class="checkbox-inline" for="MFeaters-0" ng-repeat = "f in features">
+                <input type="checkbox" name="MFeaters" checklist-model="mobile.features" checklist-value= "f" />
+                {{f.name}}
+            </label>  
+                    
+        </div>
+    </div>
+    <!-- Multiple Radios (inline) -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="os">
+            Operating System</label>
+        <div class="col-md-4">
+            <label class="radio-inline" for="os-0">
+                <input type="radio" name="os" id="os-0" value="Andriod" checked="checked" ng-model="mobile.OS" >
+                Andriod
+            </label>
+            <label class="radio-inline" for="os-1">
+                <input type="radio" name="os" id="os-1" value="Windows" ng-model="mobile.OS" >
+                Windows
+            </label>
+           
+        </div>
+    </div>
+    <!-- Select Basic -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="ddCountry">
+            Country</label>
+        <div class="col-md-4">
+            <select id="ddCountry" name="ddCountry" class="form-control" ng-model="mobile.Country" ng-options = "c as c.Country_Description for c in countryList |orderBy: Country_Description track by c.pk_Country_ID" required>
+                <option value="">-------Select--------</option>
+            </select>
+        </div>
+        <div ng-messages="mobileForm.ddCountry.$error" ng-show = "mobileForm.ddCountry.$touched && mobileForm.ddCountry.$invalid">  
+                    <p ng-message="required">Manufacturing date is required.</p>
+                </div> 
+    </div>
+    <!-- Select Basic -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="ddCountry">
+            Country</label>
+        <div class="col-md-4">
+            <select id="Select1" name="ddState" class="form-control" ng-disabled = "!mobile.Country" ng-model="mobile.State" ng-options = "s as s.State_Name for s in stateList |filter: {Country_ID: mobile.Country.pk_Country_ID} |orderBy: State_Name track by s.State_ID" required>
+                <option value="">-------Select--------</option>
+            </select>
+        </div>
+        <div ng-messages="mobileForm.ddState.$error" ng-show = "mobileForm.ddState.$touched && mobileForm.ddState.$invalid">  
+                    <p ng-message="required">Manufacturing date is required.</p>
+                </div> 
+    </div>
+    <!-- Button (Double) -->
+    <div class="form-group">
+        <label class="col-md-4 control-label" for="saveBtn">
+        </label>
+        <div class="col-md-8">
+            <button id="saveBtn" name="saveBtn" ng-disabled = "!mobileForm.$valid" class="btn btn-success" ng-click = "saveMobile()";>
+                Save</button>
+            <button id="resetBtn" name="resetBtn" class="btn btn-primary" type="reset">
+                Reset</button>
+        </div>
+    </div>
+    <pre>{{ mobile | json }}</pre>
+</fieldset>
+</form>
+---------list HTML
+
+
+
+ <div class="form-group">
+        <label class="col-md-4 control-label" for="txtMobileName">
+           Filter</label>
+        <div class="col-md-4">
+            <input id="txtMobileName" name="txtFilter" type="text" placeholder="Enter value"
+                class="form-control input-md" required="" ng-model="filter" >
+                
+        </div>
+    </div>
+<div ng-show = "showFlag" class = "alert alert-danger">{{message}}</div>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th ng-click="orderByMe('MobileName')" style = "cursor: pointer">
+                Mobile Name
+            </th>
+            <th>
+                Manufacturing Date
+            </th>
+            <th>
+                Features
+            </th>
+            <th>
+                OS
+            </th>
+            <th>
+                Country
+            </th>
+            <th>
+                State
+            </th>
+            <th>
+                Edit
+            </th>
+            <th>
+                Delete
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="m in mobiles | orderBy:myOrderBy:sortOrder |filter: filter">
+            <td>
+                {{$index + 1}}
+            </td>
+            <td>
+                {{m.MobileName}}
+            </td>
+            <td>
+                {{m.ManufacDate | date: "dd/MM/yyyy"}}                
+            </td>
+            <td>
+            <lable ng-repeat = "f in m.features ">{{f.name}}, </lable>
+                
+            </td>
+            <td>
+                {{m.OS}}
+            </td>
+            <td>
+                {{m.Country.Country_Description}}
+            </td>
+            <td>
+                {{m.State.State_Name}}
+            </td>
+            <td>
+                <a href = "#Add/{{m}}">Edit</a>
+                          
+            </td>
+            <td>
+                <a href = "" ng-click = "delelteMobile(m._id.$oid);">Delete</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+---app.js
+
+var app = angular.module('myApp', ['ngRoute', 'checklist-model', 'ngMessages']);
+
+--route.js
+
+app.config(['$routeProvider',
+  function ($routeProvider) {
+      $routeProvider.
+      when('/Add', {
+          templateUrl: 'Add.html',
+          controller: 'addMobileCtrl'
+      }).
+      when('/List', {
+          templateUrl: 'List.html',
+          controller: 'listMobileCtrl'
+      }).
+      when('/Add/:m', {
+          templateUrl: 'Add.html',
+          controller: 'addMobileCtrl'
+      }).      
+      otherwise({
+          redirectTo: '/Add'
+      });
+  } ]); 
+
+
+----------ADD controller
+
+app.controller('addMobileCtrl', function ($scope, mobileFactory, $routeParams) {
+                                                                
+    //New object initialization
+    $scope.newMobile = function () {
+
+        if ($routeParams.m == null) {
+            $scope.mobile = {};            
+        }
+        else {
+            
+            $scope.mobile = JSON.parse($routeParams.m);
+            alert($scope.mobile);
+            $scope.mobile.ManufacDate = new Date($scope.mobile.ManufacDate);
+        }
+    };
+
+    $scope.newMobile();
+    //Master fill
+    $scope.countryList = cList;
+    $scope.stateList = stateList;
+    $scope.features = [{ "id": "1", "name": "Camera" }, { "id": "2", "name": "Flash" }, { "id": "3", "name": "Gorilla Glass" }, { "id": "4", "name": "NFC"}];
+
+    $scope.saveMobile = function () {
+
+        //        alert($scope.mobile);
+
+        if ($routeParams.m == null) {
+            mobileFactory.saveMobile($scope.mobile).success(function (data) {
+
+                if (data.d == true) {
+
+                    alert('Mobile data save successfully!!!!!!');
+                }
+                else {
+                    alert('Error occured while saving mobile data!!!!!')
+                }
+                window.location = "http://localhost:5276/View/MobileDetails.aspx#/List";
+            });
+        }
+        else {
+            alert('chk123');
+            mobileFactory.editMobile($scope.mobile).success(function (data) {
+
+                if (data.d == true) {
+
+                    alert('Mobile data modified successfully!!!!!!');
+                }
+                else {
+                    alert('Error occured while saving mobile data modification!!!!!')
+                }
+
+            });
+
+        }
+
+    };
+
+
+
+
+
+});
+
+
+---- List Controller
+
+app.controller('listMobileCtrl', function ($scope, mobileFactory) {
+
+
+    $scope.listMobile = function () {
+
+
+        mobileFactory.listMobile().success(function (data) {
+
+            $scope.mobiles = JSON.parse(data.d);
+
+        });
+
+    };
+
+    //Fetching all mobile details
+    $scope.listMobile();
+
+    $scope.showFlag = false;
+    //Mobile deletion
+    $scope.delelteMobile = function (mobID) {
+
+        mobileFactory.deleteMobile(mobID).success(function (data) {
+
+            if (data.d == true) {
+                $scope.message = "Data deleted Successfully!!!";
+                $scope.showFlag = true;
+                //Fetching all mobile details
+                $scope.listMobile();
+            }
+            else {
+
+                alert("Error occured in data deletedion!!!");
+            }
+        });
+    };
+
+//Sorting grid
+    $scope.sortOrder = false;
+    $scope.orderByMe = function (x) {
+        $scope.myOrderBy = x;
+        $scope.sortOrder = !$scope.sortOrder;
+    };
+
+
+});
+
+--- service factory
+
+app.factory('mobileFactory', function ($http) {
+
+    var service = {};
+    service.saveMobile = function (mobile) {
+
+        return $http({
+
+            url: "MobileDetails.aspx/saveMobile",
+            method: "POST",
+            data: { mobileObj: angular.toJson(mobile) }
+        })
+
+    };
+
+    service.listMobile = function () {
+
+        return $http({
+
+            url: "MobileDetails.aspx/listMobile",
+            method: "GET",
+            data: {},
+            headers: {"Content-Type" : "application/json"}
+        })
+
+    };
+
+    service.deleteMobile = function (mobID) {
+
+        return $http({
+
+            url: "MobileDetails.aspx/deleteMobile",
+            method: "POST",
+            data: { mobID: mobID }
+        })
+
+    };
+
+    service.editMobile = function (mobile) {
+
+        return $http({
+
+            url: "MobileDetails.aspx/editMobile",
+            method: "POST",
+            data: { mobileObj: angular.toJson(mobile) }
+        })
+
+    };
+
+    return service;
+});
+
+
+----- Web methods
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using MobileAngularJSWebApplication.Model;
+using System.Web.Services;
+using System.Web.Script.Services;
+using MongoDB.Bson;
+
+namespace MobileAngularJSWebApplication.View
+{
+    public partial class MobileDetails : System.Web.UI.Page
+    {
+        #region Variables
+
+        string sResult = string.Empty;
+        static DbUtility oDAL = new DbUtility();
+
+        #endregion
+
+        #region WebMethods
+
+        [WebMethod]
+        public static bool saveMobile(string mobileObj)
+        {
+            return oDAL.SaveDocument(mobileObj, "Mobile");
+        }
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true)]
+        public static string listMobile()
+        {
+            return oDAL.GetAllDocumentsWithObjectId("Mobile");
+        }
+
+        [WebMethod]
+        public static bool deleteMobile(string mobID)
+        {
+            return oDAL.DeleteDocumentByObjectId("Mobile", ObjectId.Parse(mobID));
+        }
+
+        [WebMethod]
+        public static bool editMobile(string mobileObj)
+        {
+            return oDAL.UpdateDocumentByObjectId(mobileObj, "Mobile");
+        }
+
+
+        #endregion
+
+
+        //protected void Page_Load(object sender, EventArgs e)
+        //{
+
+        //}
+    }
+}
+
+
+-------------------DB Mongo
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using MongoDB.Driver;
+using System.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Driver.Builders;
+using MongoDB.Bson.IO;
+
+namespace MobileAngularJSWebApplication.Model
+{
+    public class DbUtility
+    {
+        protected MongoDatabase mongoDB { get; set; }
+        public DbUtility()
+        {
+            var mongoClient = new MongoClient(Convert.ToString(ConfigurationManager.AppSettings["MongoDBServer"]));
+            MongoServer Server = mongoClient.GetServer();
+            mongoDB = Server.GetDatabase(Convert.ToString(ConfigurationManager.AppSettings["DBName"]));
+        }
+
+        public bool SaveDocument(string objectToSave, string collectionName)
+        {
+            //BsonDocument bsdoc = BsonDocument.Parse(objectToSave);            
+            //BsonElement bele = new BsonElement("pk_Student_Id", (BsonValue)GetMaxOfAttribute(collectionName, "pk_Student_Id").ToString());
+            //bsdoc.Add(bele);
+            var document = BsonSerializer.Deserialize<BsonDocument>(objectToSave);
+            var collection = mongoDB.GetCollection<BsonDocument>(collectionName);
+            collection.Insert(document);
+            return true;
+        }
+        public bool UpdateDocument(string objectToSave, string collectionName, string key, string value)
+        {
+
+            var document = BsonSerializer.Deserialize<BsonDocument>(objectToSave);
+            var collection = mongoDB.GetCollection<BsonDocument>(collectionName);
+            collection.Update(
+            Query.EQ(key, value),
+            Update.Replace(document),
+            UpdateFlags.Upsert);
+
+            return true;
+        }
+        public bool UpdateDocumentByObjectId(string objectToSave, string collectionName)
+        {
+
+            var document = BsonSerializer.Deserialize<BsonDocument>(objectToSave);
+            var collection = mongoDB.GetCollection<BsonDocument>(collectionName);
+            collection.Save(document);
+            return true;
+        }
+        public bool DeleteDocumentByObjectId(string collectionName, ObjectId id)
+        {
+            var collection = mongoDB.GetCollection<BsonDocument>(collectionName);
+            var query = Query.EQ("_id", id);
+            collection.Remove(query);
+            return true;
+        }
+        public bool DeleteDocument(string collectionName, string key, string id)
+        {
+            var collection = mongoDB.GetCollection<BsonDocument>(collectionName);
+            var query = Query.EQ(key, id);
+            collection.Remove(query);
+            return true;
+        }
+        public string GetAllDocuments(string collectionName)
+        {
+            var collection = mongoDB.GetCollection(collectionName);
+            return collection.FindAllAs<BsonDocument>().SetFields(Fields.Exclude("_id")).ToJson();
+        }
+        public string GetAllDocumentsWithObjectId(string collectionName)
+        {
+            var collection = mongoDB.GetCollection(collectionName);
+            var jsonSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            return collection.FindAllAs<BsonDocument>().ToJson(jsonSettings);
+        }
+        public string GetDocumentById(string collectionName, string key, string value)
+        {
+            var jsonSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            var collection = mongoDB.GetCollection(collectionName);
+            var query = Query.EQ(key, value);
+            return collection.FindAs<BsonDocument>(query).SetFields(Fields.Exclude("_id")).ToJson(jsonSettings);
+        }
+        public string GetDocumentById(string collectionName, string key, ObjectId value)
+        {
+            var jsonSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            var collection = mongoDB.GetCollection(collectionName);
+            var query = Query.EQ(key, value);
+            return collection.FindAs<BsonDocument>(query).SetFields(Fields.Exclude("_id")).ToJson(jsonSettings);
+        }
+        public string GetDocumentByIdWithObjectId(string collectionName, string key, string value)
+        {
+            var jsonSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            var collection = mongoDB.GetCollection(collectionName);
+            var query = Query.EQ(key, value);
+            return collection.FindAs<BsonDocument>(query).ToJson(jsonSettings);
+        }
+        public string GetDocumentByIdWithObjectId(string collectionName, string key, ObjectId value)
+        {
+            var jsonSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.Strict };
+            var collection = mongoDB.GetCollection(collectionName);
+            var query = Query.EQ(key, value);
+            return collection.FindAs<BsonDocument>(query).ToJson(jsonSettings);
+        }
+        public MongoCollection GetCollection(string collectionName)
+        {
+            return mongoDB.GetCollection(collectionName);
+        }
+
+        public long GetCountOfCollection(string collectionName)
+        {
+            var collection = mongoDB.GetCollection(collectionName);
+            return collection.Count();
+        }
+        //public long GetMaxOfAttribute(string collectionName,string attributename)
+        //{
+        //    var collection = mongoDB.GetCollection(collectionName);
+        //    long max=1;
+        //    if (collection.FindAll().SetSortOrder(SortBy.Descending(attributename)).SetLimit(1).FirstOrDefault() != null)
+        //    {
+        //       max = collection.FindAll().SetSortOrder(SortBy.Descending(attributename)).SetLimit(1).FirstOrDefault().ToArray()[1].Value.ToInt64();
+        //    }
+        //    return max;
+        //}
+        public string GetMaxOfAttribute(string collectionName, string attributename)
+        {
+            var collection = mongoDB.GetCollection(collectionName);
+            string max = "1";
+            if (collection.FindAll().SetSortOrder(SortBy.Descending(attributename)).SetLimit(1).FirstOrDefault() != null)
+            {
+                max = collection.FindAll().SetSortOrder(SortBy.Descending(attributename)).SetLimit(1).FirstOrDefault().ToArray()[1].Value.ToString();
+            }
+            return max;
+        }
+
+    }
+}
