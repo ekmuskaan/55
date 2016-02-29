@@ -1,0 +1,990 @@
+---------HTML
+
+<!DOCTYPE html>
+<html>
+<head id="Head1" runat="server">
+    <title></title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+        rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="text/javascript" src="Controller/StudentController.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-messages.js"></script>
+    <script src="Scripts/checklist-model.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').dataTable();
+        });
+    </script>
+</head>
+<body ng-app="MyApp">
+    <form id="Form1" name="studentForm" ng-controller="StudentController" novalidate>
+    <h1>
+        STUDENT REGISTRATION FORM</h1>
+    <table align="center" cellpadding="10">
+        <!----- First Name ------------------->
+        <tr>
+            <td>
+                FIRST NAME
+            </td>
+            <td>
+                <input type="text" name="First_Name" maxlength="30" ng-model="student.FName" placeholder="Enter First Name" />{{student.FName}}(max
+                30 characters a-z and A-Z)
+                <!--<div ng-messages="studentForm.First_Name.$error" ng-if="studentForm.First_Name.$touched">
+                    <div ng-message="required">
+                        First Name is required.</div>
+                </div>-->
+            </td>
+        </tr>
+        <!----- Last Name -------------------->
+        <tr>
+            <td>
+                LAST NAME
+            </td>
+            <td>
+                <input type="text" name="Last_Name" maxlength="30" ng-model="student.LName" placeholder="Enter Last Name" />
+                <!-- <div ng-messages="studentForm.Last_Name.$error" ng-if="studentForm.Last_Name.$touched">
+                    <div ng-message="required">
+                        Last Name is required.</div>
+                </div>-->
+                (max 30 characters a-z and A-Z)
+            </td>
+        </tr>
+        <!----- Date Of Birth ----------------->
+        <tr>
+            <td>
+                DATE OF BIRTH
+            </td>
+            <td>
+                <input type="date" ng-model="student.DOB" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan = "2">
+                <div class="line line-dashed b-b line-lg pull-in">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">
+                        Datepicker</label>
+                    <div class="col-sm-10" ng-controller="DatepickerDemoCtrl">
+                        <div class="input-group w-md">
+                            <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt"
+                                is-open="opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="open($event)">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <!----- Email Id -------------->
+        <tr>
+            <td>
+                EMAIL ID
+            </td>
+            <td>
+                <input type="text" name="Email_Id" maxlength="100" ng-model="student.Email_Id" type="email"
+                    placeholder="Enter Email" />
+                <span style="color: red" ng-show="studentForm.Email_Id.$invalid"><span ng-show="studentForm.Email_Id.$error.required">
+                    EMAIL ID is required.</span></span>
+            </td>
+        </tr>
+        <!----- Mobile Number --------->
+        <tr>
+            <td>
+                MOBILE NUMBER
+            </td>
+            <td>
+                <input type="text" name="Mobile_Number" maxlength="10" ng-model="student.Mobile_Number"
+                    placeholder="Enter Mobile Number" />
+                (10 digit number)
+            </td>
+        </tr>
+        <!----- Gender ---------------->
+        <tr>
+            <td>
+                GENDER
+            </td>
+            <td>
+                <input type="radio" name="Gender" value="Male" ng-model="student.Gender" />Male
+                <input type="radio" name="Gender" value="Female" ng-model="student.Gender" />Female
+            </td>
+        </tr>
+        <!----- Address -------------->
+        <tr>
+            <td>
+                ADDRESS
+                <br />
+                <br />
+                <br />
+            </td>
+            <td>
+                <textarea name="Address" rows="4" cols="30" ng-model="student.Address">
+        </textarea>
+            </td>
+        </tr>
+        <!----- State -------------->
+        <tr>
+            <td>
+                State
+            </td>
+            <td>
+                <select ng-model="student.state" ng-options="s as s.State_Name for s in stateList | orderBy:'State_Name' track by s.State_ID">
+                    <option value="">--Select State--</option>
+                </select>
+            </td>
+        </tr>
+        <!----- District ----------------->
+        <tr>
+            <td>
+                District
+            </td>
+            <td>
+                <select ng-model="student.district" ng-disabled="!student.state" ng-options="d as d.District_Name for d in districtList |filter:{State_ID: student.state.State_ID } :true |orderBy:'districtName' track by d.District_ID">
+                    <option value="">--Select District--</option>
+                </select>
+            </td>
+        </tr>
+        <!----- Taluka ----------------->
+        <tr>
+            <td>
+                Taluka
+            </td>
+            <td>
+                <select ng-model="student.taluka" ng-disabled="!student.district" ng-options="t as t.Taluka_Name for t in talukaList |filter:{District_ID: student.district.District_ID } :true |orderBy:'Taluka_Name' track by t.Taluka_ID">
+                    <option value="">--Select Taluka--</option>
+                </select>
+            </td>
+        </tr>
+        <!----- Pin Code ------------->
+        <tr>
+            <td>
+                PIN CODE
+            </td>
+            <td>
+                <input type="text" name="Pin_Code" maxlength="6" ng-model="student.Pin_Code" placeholder="Enter Pincode" />
+                (6 digit number)
+            </td>
+        </tr>
+        <!----- Hobbies ------------->
+        <tr>
+            <td>
+                HOBBIES
+            </td>
+            <td>
+                <!--<input type="checkbox" name="Hobby_Drawing" value="Drawing" ng-model="student.Hobby1" />Drawing
+                <input type="checkbox" name="Hobby_Singing" value="Singing" ng-model="student.Hobby2" />Singing
+                <input type="checkbox" name="Hobby_Dancing" value="Dancing" ng-model="student.Hobby3" />Dancing
+                <input type="checkbox" name="Hobby_Cooking" value="Cooking" ng-model="student.Hobby4" />Sketching-->
+                <!-- <div ng-repeat="hobby in hobbies">
+                    <input type="checkbox" />{{hobby}}
+
+                </div>
+                <pre>{{hobbies|json}}</pre>-->
+                <label ng-repeat="hobby in hobbies">
+                    <input type="checkbox" data-checklist-model="student.Hobby" data-checklist-value="hobby" />
+                    {{hobby.name}}</label>
+                <!-- <pre ng-bind="student.Hobby| json"></pre>-->
+            </td>
+        </tr>
+        <!----- Qualification---------->
+        <!--
+        <tr>
+            <td>
+                QUALIFICATION
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            </td>
+            <td>
+                <table class="inner">
+                    <tr>
+                        <td align="center">
+                            <b>Sl.No.</b>
+                        </td>
+                        <td align="center">
+                            <b>Examination</b>
+                        </td>
+                        <td align="center">
+                            <b>Board</b>
+                        </td>
+                        <td align="center">
+                            <b>Percentage</b>
+                        </td>
+                        <td align="center">
+                            <b>Year of Passing</b>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="qual in qualifications">
+                        <td>
+                            {{qual.id}}
+                        </td>
+                        <td>
+                            {{qual.name}}
+                        </td>
+                        <td>
+                            <input type="text" name="ClassX_Board" maxlength="30" ng-model="student.qual.Board" />
+                        </td>
+                        <td>
+                            <input type="text" name="ClassX_Percentage" maxlength="30" ng-model="student.qual.Percentage" />
+                        </td>
+                        <td>
+                            <input type="text" name="ClassX_YrOfPassing" maxlength="30" ng-model="student.qual.YrOfPassing" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                        <td align="center">
+                            (10 char max)
+                        </td>
+                        <td align="center">
+                            (upto 2 decimal)
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!----- Course ------------->
+        <!--<tr>
+            <td>
+                COURSES<br />
+                APPLIED FOR
+            </td>
+            <td>
+                <input type="radio" name="Course_BCA" value="BCA" ng-model="student.Course" />BCA
+                <input type="radio" name="Course_BCom" value="B.Com" ng-model="student.Course">B.Com
+                <input type="radio" name="Course_BSc" value="B.Sc" ng-model="student.Course">B.Sc
+                <input type="radio" name="Course_BA" value="B.A" ng-model="student.Course">B.A{{student.Course}}
+            </td>
+        </tr>
+        -->
+        <!----- Submit and Reset ------>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="button" value="Submit" ng-click="save()" tabindex="4">
+                <input type="button" value="SaveToLocal" ng-click="saveToLocal()" tabindex="4">
+                <input type="reset" value="Reset" tabindex="4">
+            </td>
+        </tr>
+    </table>
+    <br />
+    <pre ng-bind="student|json"></pre>
+    <div class="container">
+        <h2>
+            Student List</h2>
+        <table id="myTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            >
+            <thead>
+                <tr>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th>
+                        Date Of Birth
+                    </th>
+                    <th>
+                        Email ID
+                    </th>
+                    <th>
+                        Mobile Number
+                    </th>
+                    <th>
+                        Gender
+                    </th>
+                    <th>
+                        Pincode
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                    <th>
+                        Edit Student
+                    </th>
+                    <th>
+                        Remove Student
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in studentList">
+                    <td>
+                        {{item.FName}}
+                    </td>
+                    <td>
+                        {{item.LName}}
+                    </td>
+                    <td>
+                        {{item.DOB | date:'dd/MM/yyyy'}}
+                    </td>
+                    <td>
+                        {{item.Email_Id}}
+                    </td>
+                    <td>
+                        {{item.Mobile_Number}}
+                    </td>
+                    <td>
+                        {{item.Gender}}
+                    </td>
+                    <td>
+                        {{item.Pin_Code}}
+                    </td>
+                    <td>
+                        {{item.Address}}
+                    </td>
+                    <td style="width: 100px; text-align: center;">
+                        <button class="btn btn-mini btn-success" type='button' ng-click="editStudent(item)">
+                            Edit</button>
+                    </td>
+                    <td style="width: 100px; text-align: center;">
+                        <button class="btn btn-mini btn-danger" type='button' ng-click="removeStudent(item.Id)">
+                            Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <h2>
+            Student List Local</h2>
+        <table id="Table1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            >
+            <thead>
+                <tr>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th>
+                        Date Of Birth
+                    </th>
+                    <th>
+                        Email ID
+                    </th>
+                    <th>
+                        Mobile Number
+                    </th>
+                    <th>
+                        Gender
+                    </th>
+                    <th>
+                        Pincode
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                    <th>
+                        Edit Student
+                    </th>
+                    <th>
+                        Remove Student
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in studentListstudentListLocal">
+                    <td>
+                        {{item.FName}}
+                    </td>
+                    <td>
+                        {{item.LName}}
+                    </td>
+                    <td>
+                        {{item.DOB | date:'dd/MM/yyyy'}}
+                    </td>
+                    <td>
+                        {{item.Email_Id}}
+                    </td>
+                    <td>
+                        {{item.Mobile_Number}}
+                    </td>
+                    <td>
+                        {{item.Gender}}
+                    </td>
+                    <td>
+                        {{item.Pin_Code}}
+                    </td>
+                    <td>
+                        {{item.Address}}
+                    </td>
+                    <td style="width: 100px; text-align: center;">
+                        <button class="btn btn-mini btn-success" type='button' ng-click="editStudent(item)">
+                            Edit</button>
+                    </td>
+                    <td style="width: 100px; text-align: center;">
+                        <button class="btn btn-mini btn-danger" type='button' ng-click="removeStudent(item.Id)">
+                            Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------=========================================Service
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Builders;
+using System.Web.Script.Services;
+using System.Web.Script.Serialization;
+using Newtonsoft.Json;
+
+namespace AngularAssignmentWepApp
+{
+    /// <summary>
+    /// Summary description for StudentWebService
+    /// </summary>
+    [WebService(Namespace = "http://tempuri.org/")]
+    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    [System.ComponentModel.ToolboxItem(false)]
+    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
+    [System.Web.Script.Services.ScriptService]
+    public class StudentWebService : System.Web.Services.WebService
+    {
+        string CollectioName = "Student";
+        [WebMethod]
+        public void SaveStudent(Student student)
+        {
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+            //database.GetCollection(CollectioName).Insert(employee);
+            database.GetCollection(CollectioName).Insert<Student>(student);
+
+        }
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        public string getStudentList()
+        {
+            string returnDocs = string.Empty;
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+
+            var student = database.GetCollection<Student>("Student");
+
+            //var fields = new FieldsBuilder<EmployeeInfo>().Exclude(p => p._id);
+            //MongoCursor<EmployeeInfo> cursor = employees.FindAll().SetFields(fields);
+
+            MongoCursor<Student> cursor = student.FindAll();
+
+            List<Student> entities = cursor.ToList();
+
+            //JavaScriptSerializer Json = new JavaScriptSerializer();
+            //returnDocs = Json.Serialize(entities);
+            returnDocs = ObjectToJSON(entities);
+            return returnDocs;
+        }
+        public static string ObjectToJSON(dynamic objModel)
+        {
+            string JSONString = string.Empty;
+            JSONString = JsonConvert.SerializeObject(objModel);
+            return JSONString;
+        }
+
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        public string getState()
+        {
+            string returnDocs = string.Empty;
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+
+            var states = database.GetCollection<State>("State");
+
+            //var fields = new FieldsBuilder<EmployeeInfo>().Exclude(p => p._id);
+            //MongoCursor<EmployeeInfo> cursor = employees.FindAll().SetFields(fields);
+
+            MongoCursor<State> cursor = states.FindAll();
+
+            List<State> entities = cursor.ToList();
+
+            JavaScriptSerializer Json = new JavaScriptSerializer();
+            returnDocs = Json.Serialize(entities);
+            return returnDocs;
+        }
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        public string getDistrict()
+        {
+            string returnDocs = string.Empty;
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+
+            var districts = database.GetCollection<District>("District");
+
+            //var fields = new FieldsBuilder<EmployeeInfo>().Exclude(p => p._id);
+            //MongoCursor<EmployeeInfo> cursor = employees.FindAll().SetFields(fields);
+
+            MongoCursor<District> cursor = districts.FindAll();
+
+            List<District> entities = cursor.ToList();
+
+            JavaScriptSerializer Json = new JavaScriptSerializer();
+            returnDocs = Json.Serialize(entities);
+            return returnDocs;
+        }
+
+        [WebMethod]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        public string getTaluka()
+        {
+            string returnDocs = string.Empty;
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+
+            var talukas = database.GetCollection<Taluka>("Taluka");
+
+            //var fields = new FieldsBuilder<EmployeeInfo>().Exclude(p => p._id);
+            //MongoCursor<EmployeeInfo> cursor = employees.FindAll().SetFields(fields);
+
+            MongoCursor<Taluka> cursor = talukas.FindAll();
+
+            List<Taluka> entities = cursor.ToList();
+
+            JavaScriptSerializer Json = new JavaScriptSerializer();
+            returnDocs = Json.Serialize(entities);
+            return returnDocs;
+        }
+
+        [WebMethod]
+        public void removeStudent(string Id)
+        {
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+            var query2 = Query<Student>.EQ(fd => fd.Id, Id);
+            database.GetCollection(CollectioName).Remove(query2);
+        }
+
+        [WebMethod]
+        public void modifyStudent(Student student)
+        {
+            var client = new MongoClient("mongodb://localhost");
+            var server = client.GetServer();
+            var database = server.GetDatabase("StudentDBNew");
+            //Delete
+            //var query2 = Query<Student>.EQ(fd => fd.Id, student.Id);
+            //database.GetCollection(CollectioName).Remove(query2);
+            //Insert
+            database.GetCollection(CollectioName).Save<Student>(student);
+            //var query3 = Query<Student>.EQ(e => e.EmployeeId, student.EmployeeId);
+            //var update = Update<Student>.Set(e => e.Name, student.Name); // update modifiers
+            //var update2 = Update<Student>.Set(e => e.DeskNo, student.DeskNo); // update modifiers
+            //database.GetCollection(CollectioName).Update(query3, update);
+            //database.GetCollection(CollectioName).Update(query3, update2);
+
+
+            //var query2 = Query<EmployeeInfo>.EQ(fd => fd.EmployeeId, employee.EmployeeId);
+            //var result = database.GetCollection("EmployeeInfo").FindAndModify(query2, employee);
+
+            //MongoCollection symbolcollection = database.GetCollection<EmployeeInfo>("Symbols");
+            //EmployeeInfo symbol = symbolcollection.AsQueryable<>().Where<EmployeeInfo>(sb => sb.Name == employee.Name).SingleOrDefault();  
+
+            //EmployeeInfo emp1 = symbolcollection.FindAndModify(
+
+            //symbolcollection.Save(symbol); 
+
+
+            //database.GetCollection("EmployeeInfo").Insert(employee);
+        }
+
+        public class Student
+        {
+            [BsonId]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string Id { get; set; }
+            public string FName { get; set; }
+            public string LName { get; set; }
+            public DateTime DOB { get; set; }
+            public string Email_Id { get; set; }
+            public string Mobile_Number { get; set; }
+            public string Gender { get; set; }
+            public string Address { get; set; }
+            //public int state { get; set; }
+            //public int district { get; set; }
+            //public int taluka { get; set; }
+            public State state { get; set; }
+            public District district { get; set; }
+            public Taluka taluka { get; set; }
+            public string Pin_Code { get; set; }
+            public List<Hobby> Hobby { get; set; }
+        }
+
+        public class State
+        {
+
+            [BsonId]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string Id { get; set; }
+            public int State_ID { get; set; }
+            public string State_Name { get; set; }
+
+        }
+
+        public class District
+        {
+            [BsonId]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string Id { get; set; }
+            public int State_ID { get; set; }
+            public int District_ID { get; set; }
+            public string District_Name { get; set; }
+
+        }
+
+        public class Taluka
+        {
+            [BsonId]
+            [BsonRepresentation(BsonType.ObjectId)]
+            public string Id { get; set; }
+            public int District_ID { get; set; }
+            public int Taluka_ID { get; set; }
+            public string Taluka_Name { get; set; }
+
+        }
+
+        public class Hobby
+        {
+
+            //[BsonId]
+            //[BsonRepresentation(BsonType.ObjectId)] 
+            [BsonElement("_id")]
+            public string id { get; set; }
+            public string name { get; set; }
+
+
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---==========================Controller
+
+
+
+var app = angular.module("MyApp", ["checklist-model"]);
+
+var StudentController = function ($scope, $http) {
+
+    $scope.IsEditMode = false;
+    //    $scope.student.Gender[0].checked = true;
+    $scope.student = {};
+    $scope.hobbies = [{ "name": "Drawing", "id": "1" }, { "name": "Singing", "id": "2" }, { "name": "Dancing", "id": "3" }, { "name": "Cooking", "id": "4"}];
+    $scope.qualifications = [{ "name": "Class X", "id": "1" }, { "name": "Class XII", "id": "2" }, { "name": "Graduation", "id": "3" }, { "name": "PG", "id": "4"}];
+    $scope.getstateList = function () {
+        $http({
+            url: "StudentWebService.asmx/getState",
+            dataType: 'json',
+            type: 'GET',
+            data: '',
+            headers: { "Content-Type": "application/json" }
+        }).success(function (response) {
+            //alert(JSON.parse(response.d));
+            $scope.stateList = JSON.parse(response.d);
+        }).error(function (data, status, headers, config, statusText) {
+            alert(data.Message);
+            alert(status);
+            console.log(error);
+            deferred.reject(status);
+        });
+    };
+
+    $scope.getDistrictList = function () {
+        $http({
+            url: "StudentWebService.asmx/getDistrict",
+            dataType: 'json',
+            type: 'GET',
+            data: '',
+            headers: { "Content-Type": "application/json" }
+        }).success(function (response) {
+            //alert(JSON.parse(response.d));
+            $scope.districtList = JSON.parse(response.d);
+        }).error(function (data, status, headers, config, statusText) {
+            alert(data.Message);
+            alert(status);
+            console.log(error);
+            deferred.reject(status);
+        });
+    };
+
+    $scope.getTalukaList = function () {
+        $http({
+            url: "StudentWebService.asmx/getTaluka",
+            dataType: 'json',
+            type: 'GET',
+            data: '',
+            headers: { "Content-Type": "application/json" }
+        }).success(function (response) {
+            //alert(JSON.parse(response.d));
+            $scope.talukaList = JSON.parse(response.d);
+        }).error(function (data, status, headers, config, statusText) {
+            alert(data.Message);
+            alert(status);
+            console.log(error);
+            deferred.reject(status);
+        });
+    };
+
+
+
+    $scope.getStudentList = function () {
+        $http({
+            url: "StudentWebService.asmx/getStudentList",
+            dataType: 'json',
+            type: 'GET',
+            data: '',
+            headers: { "Content-Type": "application/json" }
+        }).success(function (response) {
+            //alert(JSON.parse(response.d));
+            $scope.studentList = JSON.parse(response.d);
+        }).error(function (data, status, headers, config, statusText) {
+            alert(data.Message);
+            alert(status);
+            console.log(error);
+            deferred.reject(status);
+        });
+    };
+
+    // calling
+    $scope.getStudentList();
+    $scope.getstateList();
+    $scope.getDistrictList();
+    $scope.getTalukaList();
+    //   $scope.studentListLocal = JSON.stringify(user);
+    //    alert(JSON.stringify(user));
+
+
+
+    $scope.saveToLocal = function () {
+
+        alert(JSON.stringify({ student: $scope.student }));
+        //        var studentLocal = [];
+
+                localStorage.setItem('user', JSON.stringify({ student: $scope.student }));
+                var user = JSON.parse(localStorage.getItem('user'));
+                //        alert(JSON.stringify(user));
+                //        alert(user);
+                $scope.studentListstudentListLocal = user;
+        //        if (localStorage.getItem("user") === null) {
+//        $scope.studentLocal = [];
+
+
+        //            alert('todo');
+        //        }
+//        alert($scope.studentLocal);
+//        localStorage.setItem('user', JSON.stringify($scope.studentLocal));
+//        alert(JSON.parse(localStorage.getItem('user')));
+//        $scope.studentLocal = JSON.parse(localStorage.getItem('user'));
+//        
+//        $scope.studentLocal.push({ student: $scope.student });
+////        alert($scope.studentLocal);
+//        localStorage.setItem('user', $scope.studentLocal);
+//               var user = JSON.parse(localStorage.getItem('user'));
+//        //        //        alert(JSON.stringify(user));
+//        //        //        alert(user);
+//                $scope.studentListstudentListLocal = user;
+
+    };
+
+    $scope.save = function () {
+
+        alert(JSON.stringify({ student: $scope.student }));
+        if (!$scope.IsEditMode) {
+            $http({
+                url: "StudentWebService.asmx/SaveStudent",
+                method: "POST",
+                data: JSON.stringify({ student: $scope.student })
+            }).success(function () {
+                //                    $scope.getAll();
+                $scope.getStudentList();
+                $scope.Msg = "Record has been successfully added !";
+                alert("Success !");
+                $scope.student = {};
+                $scope.editMode = false;
+            }).error(function (data, status, headers, config, statusText) {
+                alert(data.Message);
+                alert(status);    // 400
+                console.log(error);
+                deferred.reject(status);
+            });
+        }
+        else {
+
+            $http({
+                url: "StudentWebService.asmx/modifyStudent",
+                method: "POST",
+                data: JSON.stringify({ student: $scope.student })
+            }).success(function () {
+                //                    $scope.getAll();
+                $scope.getStudentList();
+                $scope.Msg = "Record has been successfully updated !";
+                alert("Update Success !");
+                $scope.student = {};
+                $scope.editMode = false;
+            }).error(function (data, status, headers, config, statusText) {
+                alert(data.Message);
+                alert(status);    // 400
+                console.log(error);
+                deferred.reject(status);
+            });
+        }
+    };
+
+    $scope.removeStudent = function (id) {
+        $http({
+            url: "StudentWebService.asmx/removeStudent",
+            method: "POST",
+            data: JSON.stringify({ Id: id })
+        })
+            .success(
+					function () {
+					    $scope.getStudentList();
+
+					}).error(function (data, status, headers, config, statusText) {
+					    alert(data.Message);
+					    alert(status);
+					    console.log(error);
+					    deferred.reject(status);
+					});
+    };
+
+    //    $scope.modifyStudent = function (id) {
+    //        $http({
+    //            url: "StudentWebService.asmx/removeStudent",
+    //            method: "POST",
+    //            data: JSON.stringify({ Id: id })
+    //        })
+    //            .success(
+    //					function () {
+    //					    $scope.getStudentList();
+
+    //					}).error(function (data, status, headers, config, statusText) {
+    //					    alert(data.Message);
+    //					    alert(status);
+    //					    console.log(error);
+    //					    deferred.reject(status);
+    //					});
+    //    };
+
+    $scope.editStudent = function (Estudent) {
+        $scope.student = {};
+        $scope.student = Estudent;
+        $scope.student.DOB = new Date(Estudent.DOB);
+        $scope.IsEditMode = true;
+    };
+
+
+};
+
+app.controller('DatepickerDemoCtrl', ['$scope', function ($scope) {
+    $scope.today = function () {
+        $scope.dt = new Date();
+    };
+    $scope.today();
+
+    $scope.clear = function () {
+        $scope.dt = null;
+    };
+
+    // Disable weekend selection
+    $scope.disabled = function (date, mode) {
+        return (mode === 'day' && (date.getDay() === 0 || date.getDay() === 6));
+    };
+
+    $scope.toggleMin = function () {
+        $scope.minDate = $scope.minDate ? null : new Date();
+    };
+    $scope.toggleMin();
+
+    $scope.open = function ($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.opened = true;
+    };
+
+    $scope.dateOptions = {
+        formatYear: 'yy',
+        startingDay: 1,
+        class: 'datepicker'
+    };
+
+    $scope.initDate = new Date('2016-15-20');
+    $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+    $scope.format = $scope.formats[0];
+} ])
+  ; 
+
+app.controller("StudentController", StudentController);
+
+
+
+
+
+
